@@ -1,0 +1,165 @@
+To copy inmessage to out message
+ =================================
+ MbMessage outMessage = new MbMessage(inAssembly.getMessage());
+ MbMessageAssembly outAssembly = new MbMessageAssembly(inAssembly, outMessage);
+ 
+To copy all input trees to output trees 
+=======================================
+ MbMessageAssembly outAssembly=new MbMessageAssembly(inAssembly,inAssembly.getLocalEnvironment(),inAssembly.getExceptionList(),inAssembly.getMessage());
+ 
+ To create json message
+ ======================
+ MbMessage outMessage = new MbMessage();
+ MbElement outRoot = outMessage.getRootElement();
+ MbElement outJsonRoot = outRoot.createElementAsLastChild(MbJSON.PARSER_NAME);
+ MbElement outJsonData = outJsonRoot.createElementAsLastChild(MbElement.TYPE_NAME, MbJSON.DATA_ELEMENT_NAME, null);
+ MbElement outJsonTest = outJsonData.createElementAsLastChild(MbElement.TYPE_NAME_VALUE, "Message", "Hello World");
+ 
+ 
+copyMessageHeaders(inMessage, outMessage); // copy headers from the input message
+
+Propagating a message to the JavaCompute node Out and Alternate terminals
+https://www.ibm.com/support/knowledgecenter/en/SSMKHH_9.0.0/com.ibm.etools.mft.doc/ac30380_.htm
+
+
+
+Accessing localenvironment value
+=================================
+inAssembly.getLocalEnvironment().getRootElement().getFirstChild().getFirstChild().getValue()
+
+inAssembly.getLocalEnvironment().getRootElement().getFirstChild().getFirstElementByPath("/Name").getValue()
+
+Accessing environment value
+=============================
+inAssembly.getGlobalEnvironment().getRootElement().getFirstChild().getValue()
+
+inAssembly.getGlobalEnvironment().getRootElement().getFirstChild().getFirstElementByPath("/Name").getValue()
+
+To set value in Local environment
+=================================
+MbMessage local = inAssembly.getLocalEnvironment();
+MbMessage newlocal = new MbMessage(local);
+newlocal.getRootElement().createElementAsFirstChild(MbElement.TYPE_NAME_VALUE,"Newlocal","Success");
+					
+					
+To set value in Environment
+=============================
+MbMessage env = inAssembly.getGlobalEnvironment();
+MbMessage newEnv = new MbMessage(env);
+newEnv.getRootElement().createElementAsFirstChild(MbElement.TYPE_NAME_VALUE,"NewEnvironment","Success");
+					
+
+
+Accessing elements in a message tree from a JavaCompute node
+https://www.ibm.com/support/knowledgecenter/en/SSMKHH_9.0.0/com.ibm.etools.mft.doc/ac30330_.htm
+
+Methods to create outAssembly
+==============================
+MbMessageAssembly(MbMessageAssembly assembly, MbMessage message)
+
+MbMessageAssembly(MbMessageAssembly assembly, MbMessage localEnvironment, MbMessage exceptionList, MbMessage message)
+
+MbMessageAssembly(MbMessageAssembly assembly, MbMessage localEnvironment, MbMessage globalEnvironment, MbMessage exceptionList, MbMessage message)
+
+=======================================
+MbElement root = outMessage.getRootElement();
+MbElement document = root.getLastChild().getFirstChild();
+MbElement chapter2 = document.createElementAsLastChild(MbElement.TYPE_NAME,"Chapter",null);
+
+// add title attribute
+MbElement title2 = chapter2.createElementAsFirstChild(MbElement.TYPE_NAME_VALUE, 
+	"title",	"Message Flows");
+	
+<document>
+	<chapter title="Introduction">
+		Some text.   
+	</chapter>
+	<chapter title="Message Flows"/> 
+</document>  	
+
+============================================
+{"response": {
+   "status": "Success",
+   "uniqueID": "8cac3bf5"
+}}
+
+MbMessage outMessage = new MbMessage();
+			MbElement outRoot = outMessage.getRootElement();
+			MbElement outJsonRoot = outRoot
+					.createElementAsLastChild(MbJSON.PARSER_NAME);
+			MbElement outJsonData = outJsonRoot.createElementAsLastChild(
+					MbElement.TYPE_NAME, MbJSON.DATA_ELEMENT_NAME, null);
+			MbElement response = outJsonData.createElementAsLastChild(MbElement.TYPE_NAME,"response",null);
+			MbElement outJsonTest = response.createElementAsLastChild(
+					MbElement.TYPE_NAME_VALUE, "status", "Success");
+			MbElement outJsonTest1 = response.createElementAsLastChild(
+					MbElement.TYPE_NAME_VALUE, "uniqueID", inAssembly
+							.getLocalEnvironment().getRootElement()
+							.getFirstChild().getFirstElementByPath("/uniqueID")
+							.getValue().toString());
+			outAssembly = new MbMessageAssembly(inAssembly, outMessage);	
+			
+=====================================================
+String uniqueID = UUID.randomUUID().toString().substring(0, 8);
+			MbMessage env = inAssembly.getLocalEnvironment();
+
+			MbMessage newEnv = new MbMessage(env);
+			MbElement Destination = newEnv.getRootElement()
+					.createElementAsFirstChild(MbElement.TYPE_NAME,
+							"Destination", null);
+			MbElement File = Destination.createElementAsFirstChild(
+					MbElement.TYPE_NAME, "File", null);
+			MbElement Directory = File.createElementAsFirstChild(
+					MbElement.TYPE_NAME_VALUE, "Directory",
+					"C:\\Users\\poosala.madhu\\Documents\\Tasks");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HHmmss");
+			String dt  = dateFormat.format(new Date());
+			MbElement Name = File.createElementAsFirstChild(
+					MbElement.TYPE_NAME_VALUE, "Name", uniqueID+dt+".txt");
+			newEnv.getRootElement().createElementAsFirstChild(MbElement.TYPE_NAME_VALUE, "uniqueID",
+					uniqueID);
+			outAssembly = new MbMessageAssembly(inAssembly, newEnv,
+					inAssembly.getExceptionList(), inAssembly.getMessage());			
+
+=======================================================
+import com.ibm.broker.javacompute.MbJavaComputeNode;
+import com.ibm.broker.plugin.*;
+import java.sql.*;
+
+
+public class testeJdbc_JavaCompute extends MbJavaComputeNode {
+
+public void evaluate(MbMessageAssembly contact admin) throws MbException {
+MbOutputTerminal out = getOutputTerminal("out");
+MbMessage inMessage = contact admin.getMessage();
+
+// create new message
+MbMessage outMessage = new MbMessage(inMessage);
+MbMessageAssembly outAssembly = new MbMessageAssembly(contact admin,outMessage);
+
+try {
+// Obtain a java.sql.Connection using a JDBC Type4 datasource - in this example for a
+// JDBC broker configurable service called "Oracle"
+
+Connection conn = getJDBCType4Connection("Oracle",JDBC_TransactionType.MB_TRANSACTION_AUTO);
+
+// Example of using the Connection to create a java.sql.Statement
+Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+ResultSet srs0 = stmt.executeQuery("SELECT * from openris.mestre_nfsd_merc");
+
+
+
+// Perform other database updates
+
+
+} catch (Exception sqx ){
+sqx.printStackTrace();
+
+} finally {
+// clear the outMessage
+outMessage.clearMessage();
+}
+
+}
+}
+					

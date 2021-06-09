@@ -1,0 +1,60 @@
+https://www.ibm.com/support/knowledgecenter/en/SSMKHH_9.0.0/com.ibm.etools.mft.doc/ap12234_.htm#ap12234_6
+
+
+C:\Program Files\IBM\IIB\10.0.0.7\common\jdk\jre\bin
+
+
+C:\Program Files\IBM\MQSI\9.0.0.2\jre17\bin -- IIB 9
+
+1. Create KeyStore using ikeyman(C:\Program Files\IBM\IIB\10.0.0.7\common\jdk\jre\bin\ikeyman.exe)
+   i. Create KeyStore(.jks)
+   ii.Create new self signed certficate
+   iii.Extract certficate(.arm) --> To be added to trust store
+2. Add KeyStore to BrokerRegistry
+
+mqsichangeproperties IB9NODE -o BrokerRegistry -n brokerKeystoreFile -v 'C:\Rajesh\SSLCertificate\key.jks'(Location of KeyStore)
+
+Optional:(If we call other SSL service)
+
+mqsichangeproperties IB9NODE -o BrokerRegistry -n brokerTruststoreFile -v 'C:\Rajesh\SSLCertificate\Trust.jks'(Location of TrustStore)
+
+3.Enable SSL Connector
+
+mqsichangeproperties IB9NODE -b httplistener -o HTTPListener -n enableSSLConnector -v true
+
+
+
+4.Give Authentication to KeyStore
+
+mqsisetdbparms IB9NODE -n brokerKeystore::password -u c3143 -p creditcards
+
+5.Restart Broker
+
+
+
+Middleware team once they create keystore and trustore and they will add cerficate every time to this truststore and they assign this path to required eg
+EG level SSL configuration:- 
+ 
+step1: To see truststoreFile path and other properties of ExecutionGroup
+ 
+mqsireportproperties IB9NODE -e N -o ComIbmJVMManager -r
+ 
+ 
+STEP:2  import certificate to your keystore 
+ 
+ 
+keytool -importcert -file aclcert.pem -keystore /var/mqsi/keys/mqbrkrs.truststore -storepass iib#trust123 -alias aclcert
+ 
+step 3: check that certificate imported to keystore or not.
+ 
+keytool -list -keystore /var/mqsi/keys/mqbrkrs.truststore -storepass iib#trust123
+ 
+ 
+step4: assign your certificate imported path to EG truststoreFile
+ 
+mqsichangeproperties IB9NODE -e N -o ComIbmJVMManager -n truststoreFile -v /var/mqsi/keys/mqbrkrs.truststore
+ 
+step5: chnaging your EG truststore password to same as keystore password
+ 
+mqsichangeproperties IB9NODE -e N -o ComIbmJVMManager -n truststorePass -v iib#trust123
+ 
