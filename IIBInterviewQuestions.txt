@@ -1,0 +1,314 @@
+Interview Questionss:
+Tell me about yourself?
+I've started my IT carrier with (prev company name) as IIB developer
+total experience,
+relevant experience
+roles and responsibility in  my prev company were
+Gathering requirement,analysing requirement,developing IIB application, performing basic testing of IIB flows deploying in QA UAT and production servers
+In my experience i've worked on HTTp nodes,file nodes,mq nodes,construction nodes, routing nodes,compute node,timer nodes,soap nodes etc
+I've interacted with database,
+I've integratted pan service, aadhar services in my flow
+
+https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=overview-glossary-terms-abbreviations#ax99997___ax99997_eg
+
+1)What is message tree structure(Logical tree) in IIB?
+Whenever any input comes to IIB application then IIB creates a message tree structure it will have 4 sections
+message
+localenvironment
+environment
+expectionlist
+
+again in message it will properties,Headers,Message
+
+what is the diff between LocalEnvironment & Environment
+
+LocalEnvironment:
+To override destination node properties
+we can store data in it (we must set compute mode property localenv and message)
+If any exception occurs in that case the values stored in it will be rolled back
+
+Environment:
+We can use this to store data which will be available in entire flow
+If any exception occurs in that case the values stored in it will not be rolled back
+we can't override destination node properties
+
+
+ESB= Enterprise service Buss=Middleware Guy
+
+IIB is one of the ESB
+
+
+1)IIB9 vs IIB10 Difference?
+a)Queue manager dependency to create node in IIB 9 but not in IIB10
+b)There is no flow exerciser option in IIB9
+c)We can create only static library in IIB9 but in 10 we can create static and shared
+d)We can't connect two diff databases from single compute node in IIB9 but we can in IIB10
+
+
+
+
+2)Static library vs shared library difference
+a)if there are any changes in static libary then in that case we need to deploy static lib and  all the application which are using this static lib should be deployed to effect the latest changes of static lib to application 
+b)But where as , if there are any changes in shared libary then in that case we no need to deploy all the applications we just deploy only shared lib
+
+3)MQ Input node transaction modes?
+Refer QueueTransactionMode_15_05_2021_16_05_2021
+
+4)MQGET node?
+In the middle of the flow if you want to read a message from a queue we use this node
+
+5)How to connect to database from IIB?
+a)we need to creat DSN in  datasource
+  choose system dsn
+  give dsn name
+  give db server ip ,port
+  give db credentials
+  choose database
+  test connection
+b)we run mqsisetdbparms Nodenme -n DSNNAME -u username -p password
+c)to check connectivity mqsicvp  Nodenme -n DSNNAME
+d)we need to restart EG if doesn't work restart node
+e)by using PASSTHUR statement in esql we can interact with database
+
+6)How do you debug a flow in IIB?
+there two options to debug a flow
+a)add break point to flow and launch debugger
+b)using flow exerciser
+
+
+Learn about all the nodes in IBM Knowledge center
+7)Learn about all the terminals of each node
+8)Learn about all the property that we set for each node
+9)Learn about all the header which be populated in header setion in message tree structure for each input node
+
+How do you troublshoot the issues?
+We wil check database logs
+we will check eg logs
+
+How do you deploy an application?
+mqsideploy nodename -e egname -a applicationName
+
+What is properties file?
+it contains all the properties of each node and also it contains external UDPs(if we create any) 
+
+How to generate properties file?
+mqsireadbar -b completebarfilePathwithbarFilename -r > LocationInwhichyouWantTOStore.properties
+
+What are the function and statatement that you know in esql?
+
+what is COALESCE?
+It returns first non NULL value
+
+COALESCE(InputRoot.JSON.Data.req.msg,Environment.msg,'');
+
+what is CARDINALITY?
+It returns count of array elements
+
+what is PASSTHUR statement?
+It is used to execute database queries..you can mention sytax also if you are comforatble
+
+What is PROPAGATE statement?
+It is used to route message to different destionations
+
+What is ASBITSTREAM ?
+It is an esql function which is used to convert message present in tree to BLOB format
+
+In which you go for HTTP Nods and in which case you go for SOAP Nodes?
+If you want to implement WS security & WS addressing in your flows and if you want to put strict validation on input and output messsages in that case we go for SOAP.
+Where as in HTTP there will not such kind of concepts WS security & WS addressing.We need to put validation manually using validation node
+
+How do you run batch job every day on particular time?
+Using Timernodes we can do this (TimerNotificatio and TimerControl)
+
+What is the difference between Filter nodes and compute node
+Filter node just routes messages to any one of the terminals(Unknown,true,false) based on condition and there wil not be InputRoot or OutputRoot here we will have only Root.
+Unlike Filernode in compute node we can implement many things like Routing,Tranformations ,Message enrichment.
+
+What is an IIB application?
+It is like an container and it is an Integration solution which holds msgflows,subflows,esql files,DFDLs,WSDLS, references..etc
+application =Integration solution=Interfaces=webservice(means service avaiable over web(internet))(If we use soap nodes in our flow then we call it as SOAP webservices else if we use HTTP nodes then we call HTTP Webservice)
+An application can have multiple APIs(one Req & Res is an API)
+
+what is broker?
+A set of execution processes that host one or more message flows. Also known as a message broker and an integration node.
+
+what is an bar file?
+The unit of deployment to the broker; also known as a BAR file. The broker archive file contains a number of different files, including compiled message flows (.cmf) and message sets (.dictionary and .xsdzip files), 
+
+broker schema?
+To defines the scope of uniqueness of the names of resources that are defined within it. The resources include message flows, ESQL files, and mapping files.
+
+
+what is an API?
+Full form is Application programming interface.Which means it accepts request and process the message and sends reponse back
+
+URL,Endpoint,context path,hostname,port,ssl,SMTP server,SFTP server,SOAP,REST,Wsdl,json,xml,soap message format?
+what is ESQL?
+
+What is the diff b/w local variable,External variable,Shared variable?
+https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=overview-esql-variables
+
+we create and use local variables in a compute node for storing any temporaty values
+DECLARE url CHARACTER ;
+Life span: With in compute node
+==================
+
+We create this in UDPs and we will use this in compute node .This value wil be avaiable in properties file.In future if there are any changes we just change that value in property file and we will apply baroverride and deploy.
+There will be some variables which will be differ from environment to environment in that case we should use this variable
+
+DECLARE url EXTERNAL CHARACTER
+
+Life span: available Entire message flow
+====================
+Instead of hitting database every time for fetching same vaule we use shared var.If we want to store any value and if it should be avaiable to multiple hits 
+
+DECLARE url SHARED CHARACTER ;
+
+Life span: available for multiple hits(value wil be deleted if we restart msgflow,Application,eg,node)
+
+what is the purpose of subflow?
+If there is any common code and it required in multiple message flows with in an application in that case(instead of writing duplicate code every time) we  create subflow and we put that common code in it and we use that where required (right click add subflow)
+
+
+
+what is the purpose of Library?
+If there is any common code and it required for applications(DBLogging,Exception handling) in that case(instead of writing duplicate code every time) we  create subflow in Library and we put that common code in it and we use that where required (first give ref to appliction & right click add subflow)
+
+exception list?
+A list of exceptions, with supporting information, that has been generated during the processing of a message.
+
+execution group? (renamed integration server in V9)
+A named grouping of message flows that have been assigned to a broker. An integration server process is also known as a DataFlowEngine (DFE)
+
+what are keystore and trustore?
+
+They are like small databases for storing ssl certificates
+
+message flow?
+A sequence of processing steps that run in the broker when an input message is received
+
+message flow node?
+A processing step in a message flow, also called a message processing node
+
+message parser
+A program that interprets an incoming message and creates an internal representation of the message in a tree structure, 
+
+queue(To store messages and to retrive message)
+A WebSphere MQ object to which message queuing applications can put messages, and from which message queuing applications can get messages.
+queue manager (to manage queues)
+A system program that provides queuing services to applications
+
+Admin commands?
+
+what ssl ?
+
+intervies questions links.
+
+https://ibmintegrationbus.wordpress.com/category/iib-interview-questions/
+
+https://svrtechnologies.com/new-47-iib-development-interview-questions-and-answers/
+
+Youtube Channel
+Middleware Guy
+
+
+what is use of transaction property in compute node?
+it have two options
+Automatic -->if we set this property in that case if there are any database queries(insert, update) then those will be effected permantely into database only when entire flow excutes successfully
+
+commit-->if we set this property in that case if there are any database queries(insert, update) then those will be effected permantely into database when entire code in compute node excutes(or control comes out ) successfully
+
+If we write COMMIT in esql after passthru in that case queries will be insertd/updated permantely to the database (irrespective of whether control comes out of  compute node or entire flow executes successfully )
+
+
+Configurable sevices?
+Without deploying code if we want to change configurataion details at run time, in that case we need to use Configurable sevices
+We mainly use it for EMail,ftp(we can change any node property by user defined configurable serivces)
+
+https://www.ibm.com/docs/en/integration-bus/9.0.0?topic=commands-mqsicreateconfigurableservice-command
+
+
+mqsicreateconfigurableservice test1 -c SMTP -o myEmailConfigurableServiceName -n serverName,securityIdentity -v smtp.mailtrap.io:587,MySecurityId
+after creating this we can see in web user interface
+
+mqsichangeproperties test1 -c SMTP -o myEmailConfigurableServiceName -n serverName,securityIdentity -v smtp.mailtrap.io:587,MySecurityId
+
+mqsideleteconfigurableservice test1 -c SMTP -o myEmailConfigurableServiceName
+
+mqsicreateconfigurableservice IB9NODE -c FtpServer -o Server01 
+-n serverName,scanDelay,transferMode,connectionType,securityIdentity 
+-v one.hursley.abc.com:123,20,Binary,ACTIVE,secId
+
+
+What are the HTTP codes?
+
+HTTP 200 succcess
+HTTP 404 resource not found
+HTTP 500 internal server error
+search in google
+
+
+How to read both json and xml msg in a flow?
+Refer blob task.
+Read msg in blob format and  check msg in computenode
+
+=========================
+shor cuts:
+
+Ctrl+H  --> to seach a keyword in entire workspace
+Ctrl+F --> to search with in compute node esql
+ctrl+shift+F --> format esql
+ctrl+ - >>comment code in dsql
+ctrl+shift+ - -->uncommentcode
+ctrl+B -->Build esql manually
+ctrl+d --> to delete current line in esql
+Sleep function: to hold our flow temporarily for some time we use this esql function
+
+==============
+
+what are additional instances?
+If we incrase count then it will be able to process multiple requests at time.By default it is 1
+Give this coutn < 60 
+example:
+XMLArray_17_04_2021#additionalInstances=20
+
+
+What is differece between Broker wide Listener & Embbedded Listerner?
+If any application listening at node port we call it  as Broker wide Listener
+If any application listening at eg port we call it  as Embbedded Listerner
+Bydefault HTTP Nodes listens at node port (7080)-->Broker wide Listener
+Bydefault SOAP Nodes listens at eg port(7800) -->Embbedded Listerner
+
+
+If we want our applications to listen at node port use below command
+mqsichangeproperties <brokername> -b httplistener -o HTTPListener -n startListener -v true
+
+
+If we want our applications to listen at eg port use below command
+mqsichangeproperties <brokername> -b httplistener -o HTTPListener -n startListener -v false
+
+
+How wil you troublshoot the issues?
+First wil check DB logs or file logs if we still didnt understand we will check eg logs
+
+To enable eg logs or trace
+mqsichangetrace nodename -u -e egname -l debug  --> this starts writing logs
+mqsireadlog Nodename -u -e egname -f -o C:/naresh/narsh.out
+mqsiformatlog -i C:/naresh/narsh.out -o C:/naresh/tracelogs.out
+
+
+To disable eg logs or trace(after u found issue disable logs)
+mqsichangetrace nodename -u -e egname -l none  --> this stops writing logs
+
+To search error "E:"
+
+
+mqsichangetrace test1 -n -e test -l none
+
+mqsireadlog test1 -u -e test -f -o C:\Users\haris\IBM\IIBT10\workspaceNaresh\BARfiles\naresh.out
+
+
+mqsiformatlog -i C:\Users\haris\IBM\IIBT10\workspaceNaresh\BARfiles\naresh.out -o C:\Users\haris\IBM\IIBT10\workspaceNaresh\BARfiles\tracelogs.out
+
+
+
