@@ -1,0 +1,16 @@
+﻿GlobalCache:
+
+
+mqsistop NodeName
+mqsichangebroker NodeName -b default      --To enable global cache
+mqsistop NodeName
+
+
+
+In java compute node put below code:
+
+MbGlobalMap globalMap=MbGlobalMap.getGlobalMap("MyMap");
+globalMap.put("Name","Naresh");    --> this code should run only once, else u get error Key aleady exist
+String val = (String) globalMap.get("Name");
+
+mqsichangebroker NodeName -b disbled   --To disble  lobal cache
