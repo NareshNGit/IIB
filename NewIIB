@@ -1,0 +1,58 @@
+https://www.ibm.com/support/pages/ports-needed-web-services-app-connect-enterprise-or-ibm-integration-bus
+
+https://www.ibm.com/support/pages/secure-communication-setting-iib-over-ssltls
+
+https://www.ibm.com/mysupport/s/question/0D50z000062l4ByCAI/ssl-issues-mustgather-collecting-a-jsse-trace-on-unix?language=en_US
+
+Where to find JSSE trace stdout file?
+
+For broker listener: If in your flow, you are using HTTP/SOAP Input node with SSL enabled, your SSL trace will be found here
+
+WorkPath/mqsi /components/Brokername/httplistener/stdout
+
+For EG listener: If you are using HTTP/SOAP request node, with SSL enabled, in your flow then your SSL trace will be found here
+
+WorkPath/mqsi/components/Brokername/EGUUID/stdout
+
+For the WebUI: WorkPath/mqsi/components/Brokername/stdout
+============================
+Certificates are issued by trusted third parties, called certificate authorities (CAs).
+
+Contents of a digital certificate
+A certificate contains several pieces of information, including information about the owner of the certificate and the issuing CA. Specifically, a certificate includes:
+The distinguished name (DN) of the owner. A DN is a unique identifier, a fully qualified name including not only the common name (CN) of the owner but also the owner's organization and other distinguishing information.
+The public key of the owner.
+The date on which the certificate is issued.
+The date on which the certificate expires.
+The distinguished name of the issuing CA.
+The digital signature of the issuing CA. The message-digest function creates a signature based upon all the previously listed fields.
+=========================
+https://www.ibm.com/docs/en/app-connect/11.0.0?topic=flows-http-listeners#bc43700___bc43700_egbl
+Using both integration node and embedded listeners
+Because the option to use the embedded listener is at the integration server level, you can change your configuration such that some integration servers that are associated with an integration node use the integration node listener for HTTP nodes, SOAP nodes, or both, and other integration servers use the embedded listener for HTTP nodes, SOAP nodes, or both.
+However, if you disable the integration node listener, the integration server listeners are used for all HTTP and SOAP nodes, even if you do not explicitly enable support for them.
+
+=========================
+https://www.ibm.com/docs/en/app-connect/11.0.0?topic=flows-http-listeners#bc43700___bc43700_egbl
+By default, SOAPInput, SOAPReply, SOAPAsyncResponse, HTTPInput, HTTPReply, and HTTPAsyncResponse nodes use the integration server listener.
+========================
+https://www.ibm.com/docs/en/app-connect/11.0.0?topic=listeners-switching-from-integration-node-listener-embedded
+If you want all HTTP and SOAP nodes in all integration servers on the integration node to use the embedded listener, you can change the integration node configuration to disable the integration node listener.
+Run the mqsichangeproperties command to change the integration node configuration. Do not run this command if you want to keep the integration node listener active for at least one of your associated integration servers.
+mqsichangeproperties INODE  -b NodeHttpListener -o HTTPListener 
+	-n startListener -v false
+
+To switch to using the embedded listener for a specific integration server on an integration node, use the mqsichangeproperties command to change the integration server configuration.
+The integration node must be stopped for the switch to work. If the node is running, stop it by using the following command
+
+mqsistop integrationNodeName
+
+To use the mqsichangeproperties command, adapt one of the following examples:
+mqsichangeproperties INODE -f -e exgroup1 -o ExecutionGroup 
+	-n soapNodesUseEmbeddedListener -v true
+
+mqsichangeproperties INODE -f -e exgroup1 -o ExecutionGroup 
+	-n httpNodesUseEmbeddedListener -v true
+
+
+https://arquitecturaibm.com/wp-content/uploads/2021/03/ACEWhatsNew_UsergroupMeeting.pdf
